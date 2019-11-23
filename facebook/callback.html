@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Chat với người lạ</title>
+</head>
+
+<body>
+  <div>
+    Đang chuyển tiếp về ứng dụng...</a>
+  </div>
+  <script>
+    (function () {
+      var continueUrl = getContinueUrl() || 'https://cvnl.app';
+      var serverUrl = 'https://gth-talk-stranger.herokuapp.com';
+
+      if (continueUrl.indexOf('http://localhost') === 0) {
+        serverUrl = 'https://dev-gth-talk-stranger.herokuapp.com';
+      }
+
+      setTimeout(redirectToHome, 5000);
+
+      var accessToken = getAccessToken();
+
+      if (accessToken) {
+        postData(
+          serverUrl + '/api/auth/login',
+          { type: 'facebook', credentials: { accessToken: accessToken } },
+          function(err, resp) {
+            if (err || !resp.token) {
+              console.log('Cannot login:', err);
+            } else {
+              saveToken(resp.token);
+            }
+
+            redirectToHome();
+          });
+      } else {
+        setTimeout(redirectToHome, 1000);
+      }
+
+      function redirectToHome() {
+        window.location = continueUrl;
+      }
+
+      function getAccessToken() {
+        var match = String(window.location.hash).match(/access_token=(.*?)(&|$)/);
+
+        return match && match[1];
+      }
+
+      function getContinueUrl() {
+        try {
+          return window.localStorage.getItem('continueUrl');
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function saveToken(token) {
+        try {
+          document.cookie = 'token=' + token + '; path=/';
+        } catch (err) {
+          console.log('Cannot save token to cookie:', err);
+        }
+
+        try {
+          window.localStorage.setItem('token', token);
+        } catch (err) {
+          console.log('Cannot save token to storage:', err);
+        }
+      }
+
+      function postData(url, data, callback) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', url);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+        xhr.onload = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              callback(null, toJson(xhr.responseText));
+            } else {
+              callback(new Error('bad response code:' + xhr.status));
+            }
+          }
+        };
+
+        xhr.onerror = function () {
+          callback(new Error(xhr.statusText));
+        };
+
+        xhr.send(JSON.stringify(data));
+      }
+
+      function toJson(text) {
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          return {};
+        }
+      }
+    })();
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Logout</title>
+</head>
+
+<body>
+  <script>
+    (function () {
+      var continueUrl = getParameterByName('continue');
+
+      try {
+        document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        window.localStorage.removeItem('token');
+      } catch (err) {
+        console.log('Cannot remove token from local storage:', err);
+      }
+
+      window.location = continueUrl || 'https://cvnl.app';
+
+      function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      }
+    })();
+
+  </script>
+</body>
+
+</html>

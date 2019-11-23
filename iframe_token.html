@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <title>CVNL</title>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow" />
+</head>
+
+<body>
+  <script>
+    (function () {
+      var origin = getParameterByName('origin');
+
+      if (!isValidOrigin(origin)) {
+        console.log('invalid origin');
+        return;
+      }
+
+      var token = getToken();
+
+      window.parent.postMessage({
+        token: token
+      }, origin);
+
+      function getToken() {
+        var token;
+
+        try {
+          token = window.localStorage.getItem('token');
+        } catch (err) {
+          console.log('Cannot get token from local storage:', err);
+        }
+
+        if (!token) {
+          token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        }
+
+        return token;
+      }
+
+      function isValidOrigin(origin) {
+        return /goctamhon\.org$/.test(origin) ||
+          /cvnl\.app$/.test(origin) ||
+          /localhost:8080$/.test(origin);
+      }
+
+      function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      }
+    })();
+
+  </script>
+</body>
+
+</html>
